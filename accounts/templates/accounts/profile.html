@@ -1,0 +1,616 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}My Profile - SocialSphere{% endblock %}
+
+{% block extra_styles %}
+<style>
+  :root {
+    --primary: #6366f1;
+    --primary-dark: #4f46e5;
+    --primary-light: #c7d2fe;
+    --secondary: #f472b6;
+    --text-dark: #1f2937;
+    --text-light: #6b7280;
+    --text-lighter: #9ca3af;
+    --bg-light: #f9fafb;
+    --bg-white: #ffffff;
+    --border-light: #e5e7eb;
+    --border-focus: #a5b4fc;
+    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    --gradient: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  }
+
+  /* Profile Layout */
+  .profile-page {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 2rem 1rem;
+  }
+  
+  /* Profile Header */
+  .profile-header {
+    position: relative;
+    background: var(--bg-white);
+    border-radius: 1rem;
+    box-shadow: var(--shadow-md);
+    overflow: hidden;
+    margin-bottom: 2rem;
+  }
+  
+  .profile-cover {
+    height: 200px;
+    background: var(--gradient);
+    position: relative;
+  }
+  
+  .profile-info {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 0 2rem 2rem;
+    position: relative;
+    margin-top: -80px;
+  }
+  
+  /* Profile Image */
+  .profile-image-container {
+    position: relative;
+    margin-bottom: 1rem;
+    z-index: 2;
+  }
+  
+  .profile-image {
+    width: 160px;
+    height: 160px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 5px solid var(--bg-white);
+    box-shadow: var(--shadow-md);
+    background-color: var(--bg-white);
+  }
+  
+  .profile-image-placeholder {
+    width: 160px;
+    height: 160px;
+    border-radius: 50%;
+    background: var(--primary-light);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--primary);
+    font-size: 3rem;
+    font-weight: bold;
+    border: 5px solid var(--bg-white);
+    box-shadow: var(--shadow-md);
+  }
+  
+  .image-upload-wrapper {
+    position: absolute;
+    bottom: 5px;
+    right: 5px;
+  }
+  
+  .image-upload-label {
+    background: var(--primary);
+    color: white;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: var(--shadow-md);
+  }
+  
+  .image-upload-label:hover {
+    background: var(--primary-dark);
+    transform: translateY(-2px) scale(1.05);
+  }
+  
+  .upload-icon {
+    width: 20px;
+    height: 20px;
+    fill: currentColor;
+  }
+  
+  /* Profile Details */
+  .profile-username {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: var(--text-dark);
+    margin: 0.5rem 0;
+  }
+  
+  .profile-meta {
+    display: flex;
+    gap: 2rem;
+    margin: 1rem 0;
+  }
+  
+  .profile-stat {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .stat-value {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--text-dark);
+  }
+  
+  .stat-label {
+    font-size: 0.875rem;
+    color: var(--text-light);
+  }
+  
+  /* Profile Content */
+  .profile-content {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 2rem;
+  }
+  
+  /* Profile Form Card */
+  .profile-form-card {
+    background: var(--bg-white);
+    border-radius: 1rem;
+    box-shadow: var(--shadow-md);
+    overflow: hidden;
+  }
+  
+  .card-header {
+    padding: 1.5rem 2rem;
+    border-bottom: 1px solid var(--border-light);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  .card-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--text-dark);
+  }
+  
+  .card-body {
+    padding: 2rem;
+  }
+  
+  /* Form Elements */
+  .profile-form {
+    width: 100%;
+  }
+  
+  .form-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.5rem;
+  }
+  
+  .form-group {
+    margin-bottom: 1.5rem;
+    position: relative;
+  }
+  
+  .form-label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+    color: var(--text-dark);
+    font-size: 0.95rem;
+  }
+  
+  .form-control {
+    width: 100%;
+    padding: 1rem 1.5rem;
+    border: 2px solid var(--border-light);
+    border-radius: 0.75rem;
+    transition: all 0.3s ease;
+    font-size: 1rem;
+    background-color: var(--bg-white);
+    color: var(--text-dark);
+    box-shadow: var(--shadow-sm);
+  }
+  
+  .form-control:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px var(--border-focus);
+  }
+  
+  .form-control::placeholder {
+    color: var(--text-lighter);
+  }
+  
+  .form-control:hover {
+    border-color: var(--primary-dark);
+  }
+  
+  .input-with-icon {
+    position: relative;
+  }
+  
+  .input-with-icon .form-control {
+    padding-left: 3rem;
+  }
+  
+  .input-icon {
+    position: absolute;
+    left: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--text-light);
+    font-size: 1.25rem;
+  }
+  
+  /* Form Help Text */
+  .form-help {
+    color: var(--text-light);
+    font-size: 0.875rem;
+    margin-top: 0.5rem;
+    display: block;
+  }
+  
+  /* Form Error */
+  .form-error {
+    color: #e11d48;
+    font-size: 0.875rem;
+    margin-top: 0.5rem;
+    font-weight: 500;
+  }
+  
+  /* Submit Button */
+  .btn-primary {
+    /* background: var(--gradient); */
+    color: white;
+    padding: 1rem 1.5rem;
+    border: none;
+    border-radius: 0.75rem;
+    font-weight: 600;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    min-width: 180px;
+    box-shadow: var(--shadow-sm);
+  }
+  
+  .btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+  }
+  
+  .btn-primary:active {
+    transform: translateY(0);
+  }
+  
+  .btn-primary i {
+    font-size: 1.125rem;
+  }
+  
+  .form-actions {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 2rem;
+  }
+  
+  /* Responsive Design */
+  @media (max-width: 768px) {
+    .profile-cover {
+      height: 150px;
+    }
+    
+    .profile-info {
+      padding: 0 1.5rem 1.5rem;
+      margin-top: -70px;
+    }
+    
+    .profile-image {
+      width: 140px;
+      height: 140px;
+    }
+    
+    .profile-image-placeholder {
+      width: 140px;
+      height: 140px;
+      font-size: 2.5rem;
+    }
+    
+    .profile-username {
+      font-size: 1.5rem;
+    }
+    
+    .form-grid {
+      grid-template-columns: 1fr;
+      gap: 1rem;
+    }
+    
+    .card-body {
+      padding: 1.5rem;
+    }
+    
+    .profile-meta {
+      gap: 1.5rem;
+    }
+  }
+  
+  @media (max-width: 480px) {
+    .profile-cover {
+      height: 120px;
+    }
+    
+    .profile-info {
+      margin-top: -60px;
+    }
+    
+    .profile-image {
+      width: 120px;
+      height: 120px;
+    }
+    
+    .profile-image-placeholder {
+      width: 120px;
+      height: 120px;
+      font-size: 2rem;
+    }
+    
+    .card-header {
+      padding: 1.25rem 1.5rem;
+    }
+    
+    .card-body {
+      padding: 1.25rem;
+    }
+    
+    .form-actions {
+      justify-content: center;
+    }
+    
+    .btn-primary {
+      width: 100%;
+    }
+  }
+  
+  /* Animations */
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  
+  .animate-fade-in {
+    animation: fadeIn 0.5s ease forwards;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="profile-page">
+  <!-- Profile Header -->
+  <div class="profile-header animate-fade-in">
+    <div class="profile-cover"></div>
+    <div class="profile-info">
+      <div class="profile-image-container">
+        {% if user.profile_image %}
+        <img src="{{ user.profile_image.url }}" alt="Profile Picture"
+          class="profile-image" id="profile-image">
+        {% else %}
+        <div class="profile-image-placeholder" id="profile-image">{{
+          user.username|first|upper }}</div>
+        {% endif %}
+      </div>
+
+      <h1 class="profile-username">@{{ user.username }}</h1>
+
+      <div class="profile-meta">
+        <div class="profile-stat">
+          <span class="stat-value">{{ user.posts.count|default:"0" }}</span>
+          <span class="stat-label">Posts</span>
+        </div>
+        <div class="profile-stat">
+          <span class="stat-value">{{ user.followers.count|default:"0" }}</span>
+          <span class="stat-label">Followers</span>
+        </div>
+        <div class="profile-stat">
+          <span class="stat-value">{{ user.following.count|default:"0" }}</span>
+          <span class="stat-label">Following</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Profile Content -->
+  <div class="profile-content">
+    <!-- Profile Form Card -->
+    <div class="profile-form-card animate-fade-in"
+      style="animation-delay: 0.2s;">
+      <div class="card-header">
+        <h2 class="card-title">Personal Information</h2>
+      </div>
+      <div class="card-body">
+        <form method="post" enctype="multipart/form-data" class="profile-form">
+          {% csrf_token %}
+          <div class="form-grid">
+            {% for field in form %}
+            <div class="form-group">
+              <label for="{{ field.id_for_label }}"
+                class="form-label">{{ field.label }}</label>
+              <div class="input-with-icon">
+                {% if field.name == 'first_name' or field.name == 'last_name' %}
+                <i class="fas fa-user input-icon"></i>
+                {% elif field.name == 'email' %}
+                <i class="fas fa-envelope input-icon"></i>
+                {% elif field.name == 'bio' %}
+                <i class="fas fa-info-circle input-icon"></i>
+                {% elif field.name == 'website' %}
+                <i class="fas fa-globe input-icon"></i>
+                {% elif field.name == 'location' %}
+                <i class="fas fa-map-marker-alt input-icon"></i>
+                {% elif field.name == 'phone' %}
+                <i class="fas fa-phone input-icon"></i>
+                {% else %}
+                <i class="fas fa-edit input-icon"></i>
+                {% endif %}
+
+                {% if field.field.widget.input_type == 'textarea' %}
+                <textarea id="{{ field.id_for_label }}" name="{{ field.name }}"
+                  class="form-control"
+                  placeholder="{{ field.label }}">{{ field.value|default:'' }}</textarea>
+                {% else %}
+                <input type="{{ field.field.widget.input_type }}"
+                  id="{{ field.id_for_label }}" name="{{ field.name }}"
+                  class="form-control" placeholder="{{ field.label }}"
+                  value="{{ field.value|default:'' }}" />
+                {% endif %}
+              </div>
+
+              {% if field.help_text %}
+              <small class="form-help">{{ field.help_text }}</small>
+              {% endif %}
+
+              {% for error in field.errors %}
+              <div class="form-error">{{ error }}</div>
+              {% endfor %}
+            </div>
+            {% endfor %}
+          </div>
+
+          <div class="form-actions">
+            <button type="submit" class="btn-primary" id="update-profile-btn">
+              <i class="fas fa-save"></i>
+              <span>Update Profile</span>
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block jscode %}
+// Initialize GSAP animations
+document.addEventListener('DOMContentLoaded', function() {
+// Animate profile header
+gsap.from(".profile-header", {
+y: -30,
+opacity: 0,
+duration: 0.8,
+ease: "power3.out"
+});
+
+// Animate profile content
+gsap.from(".profile-form-card", {
+y: 30,
+opacity: 0,
+duration: 0.8,
+ease: "power3.out",
+delay: 0.3
+});
+});
+
+// Profile image preview
+document.getElementById('id_profile_image').addEventListener('change',
+function(e) {
+const reader = new FileReader();
+reader.onload = function() {
+const profileImage = document.getElementById('profile-image');
+
+// Create loading indicator
+const loadingOverlay = document.createElement('div');
+loadingOverlay.style.position = 'absolute';
+loadingOverlay.style.top = '0';
+loadingOverlay.style.left = '0';
+loadingOverlay.style.width = '100%';
+loadingOverlay.style.height = '100%';
+loadingOverlay.style.background = 'rgba(255, 255, 255, 0.7)';
+loadingOverlay.style.borderRadius = '50%';
+loadingOverlay.style.display = 'flex';
+loadingOverlay.style.alignItems = 'center';
+loadingOverlay.style.justifyContent = 'center';
+loadingOverlay.innerHTML = '<i class="fas fa-spinner fa-spin"
+  style="font-size: 2rem; color: var(--primary);"></i>';
+
+profileImage.parentNode.style.position = 'relative';
+profileImage.parentNode.appendChild(loadingOverlay);
+
+// Simulate loading delay
+setTimeout(() => {
+if (profileImage.tagName === 'IMG') {
+profileImage.src = reader.result;
+} else {
+const newImg = document.createElement('img');
+newImg.src = reader.result;
+newImg.className = 'profile-image';
+newImg.id = 'profile-image';
+profileImage.parentNode.replaceChild(newImg, profileImage);
+}
+
+// Remove loading indicator
+profileImage.parentNode.removeChild(loadingOverlay);
+
+// Show success notification
+const notification = document.createElement('div');
+notification.style.position = 'fixed';
+notification.style.bottom = '20px';
+notification.style.right = '20px';
+notification.style.background = '#10b981';
+notification.style.color = 'white';
+notification.style.padding = '1rem 1.5rem';
+notification.style.borderRadius = '0.5rem';
+notification.style.boxShadow = 'var(--shadow-md)';
+notification.style.zIndex = '1000';
+notification.style.display = 'flex';
+notification.style.alignItems = 'center';
+notification.style.gap = '0.5rem';
+notification.innerHTML = '<i class="fas fa-check-circle"></i> Profile photo
+updated successfully!';
+
+document.body.appendChild(notification);
+
+// Remove notification after 3 seconds
+setTimeout(() => {
+gsap.to(notification, {
+opacity: 0,
+y: 10,
+duration: 0.5,
+onComplete: function() {
+document.body.removeChild(notification);
+}
+});
+}, 3000);
+}, 800);
+}
+
+if (this.files[0]) {
+reader.readAsDataURL(this.files[0]);
+}
+});
+
+// Form submission
+document.querySelector('.profile-form').addEventListener('submit', function(e) {
+const btn = document.getElementById('update-profile-btn');
+const icon = btn.querySelector('i');
+const span = btn.querySelector('span');
+
+// Change button state
+icon.className = 'fas fa-spinner fa-spin';
+span.innerHTML = 'Updating...';
+btn.disabled = true;
+
+// We'll let the form submit normally, but add a visual delay
+// to show the loading state (the server will handle the actual update)
+setTimeout(() => {
+// This timeout is just for demo purposes
+// The actual form will submit and redirect
+}, 1000);
+});
+{% endblock %}

@@ -1,0 +1,421 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Add Post{% endblock %}
+
+{% block extra_styles %}
+<style>
+    /* Create Post Page Styles */
+    .create-post-container {
+        max-width: 700px;
+        margin: 0 auto;
+    }
+    
+    .page-header {
+        margin-bottom: 2rem;
+    }
+    
+    .page-title {
+        font-size: 1.75rem;
+        font-weight: 700;
+        color: var(--dark);
+        margin-bottom: 0.5rem;
+        position: relative;
+        display: inline-block;
+    }
+    
+    .page-title::after {
+        content: '';
+        position: absolute;
+        bottom: -4px;
+        left: 0;
+        width: 40px;
+        height: 3px;
+        background: var(--primary);
+        border-radius: 3px;
+    }
+    
+    .page-description {
+        color: var(--gray);
+        font-size: 0.9375rem;
+    }
+    
+    /* Form Card */
+    .form-card {
+        background-color: var(--card-bg);
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow-sm);
+        overflow: hidden;
+        border: 1px solid var(--gray-light);
+    }
+    
+    .form-card:hover {
+        box-shadow: var(--shadow-md);
+    }
+    
+    .form-header {
+        padding: 1.5rem;
+        border-bottom: 1px solid var(--gray-light);
+    }
+    
+    .form-title {
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: var(--dark);
+    }
+    
+    .form-body {
+        padding: 1.5rem;
+    }
+    
+    /* Image Upload */
+    .image-upload-container {
+        margin-bottom: 1.5rem;
+    }
+    
+    .image-preview {
+        width: 100%;
+        height: 300px;
+        border-radius: var(--radius-md);
+        background-color: var(--light);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+        margin-bottom: 1rem;
+        position: relative;
+    }
+    
+    .image-preview img {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+    }
+    
+    .image-placeholder {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 1rem;
+        color: var(--gray);
+        padding: 2rem;
+        text-align: center;
+    }
+    
+    .image-placeholder i {
+        font-size: 3rem;
+    }
+    
+    .image-upload-label {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.75rem 1.5rem;
+        background-color: var(--primary);
+        color: white;
+        border-radius: var(--radius-md);
+        font-weight: 500;
+        cursor: pointer;
+        transition: var(--transition);
+    }
+    
+    .image-upload-label:hover {
+        background-color: var(--primary-hover);
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-md);
+    }
+    
+    .image-upload-input {
+        display: none;
+    }
+    
+    /* Form Controls */
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
+    
+    .form-label {
+        display: block;
+        margin-bottom: 0.5rem;
+        font-weight: 500;
+        color: var(--dark);
+    }
+    
+    .form-control {
+        width: 100%;
+        padding: 0.875rem 1rem;
+        border: 1px solid var(--gray-light);
+        border-radius: var(--radius-md);
+        font-size: 0.9375rem;
+        transition: var(--transition);
+    }
+    
+    .form-control:focus {
+        outline: none;
+        border-color: var(--primary);
+        box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.2);
+    }
+    
+    textarea.form-control {
+        min-height: 120px;
+        resize: vertical;
+    }
+    
+    /* Form Footer */
+    .form-footer {
+        padding: 1.5rem;
+        border-top: 1px solid var(--gray-light);
+        display: flex;
+        justify-content: flex-end;
+        gap: 1rem;
+    }
+    
+    .btn-submit {
+        padding: 0.75rem 2rem;
+        background-color: var(--primary);
+        color: white;
+        border: none;
+        border-radius: var(--radius-md);
+        font-weight: 500;
+        cursor: pointer;
+        transition: var(--transition);
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .btn-submit:hover {
+        background-color: var(--primary-hover);
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-md);
+    }
+    
+    .btn-cancel {
+        padding: 0.75rem 2rem;
+        background-color: var(--light);
+        color: var(--dark);
+        border: 1px solid var(--gray-light);
+        border-radius: var(--radius-md);
+        font-weight: 500;
+        cursor: pointer;
+        transition: var(--transition);
+    }
+    
+    .btn-cancel:hover {
+        background-color: var(--gray-light);
+    }
+    
+    /* Form Errors */
+    .form-error {
+        color: var(--secondary);
+        font-size: 0.875rem;
+        margin-top: 0.5rem;
+    }
+    
+    /* Loading Animation */
+    .loading-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: rgba(0, 0, 0, 0.5);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 1000;
+        opacity: 0;
+        visibility: hidden;
+        transition: var(--transition);
+    }
+    
+    .loading-overlay.active {
+        opacity: 1;
+        visibility: visible;
+    }
+    
+    .loading-spinner {
+        width: 50px;
+        height: 50px;
+        border: 4px solid rgba(255, 255, 255, 0.3);
+        border-radius: 50%;
+        border-top-color: white;
+        animation: spin 1s ease-in-out infinite;
+    }
+    
+    @keyframes spin {
+        to { transform: rotate(360deg); }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="create-post-container">
+    <div class="page-header">
+        <h1 class="page-title">Create a New Post</h1>
+        <p class="page-description">Share your moments with your followers</p>
+    </div>
+
+    <div class="form-card">
+        <div class="form-header">
+            <h2 class="form-title">Upload Photo</h2>
+        </div>
+
+        <form method="post" enctype="multipart/form-data" id="post-form">
+            {% csrf_token %}
+
+            <div class="form-body">
+                <div class="image-upload-container">
+                    <div class="image-preview" id="image-preview">
+                        <div class="image-placeholder">
+                            <i class="fas fa-cloud-upload-alt"></i>
+                            <p>Drag and drop your image here or click to
+                                browse</p>
+                        </div>
+                    </div>
+
+                    <label for="id_image" class="image-upload-label">
+                        <i class="fas fa-camera"></i>
+                        <span>Choose Image</span>
+                    </label>
+                    <input type="file" name="image" id="id_image"
+                        accept="image/*" class="image-upload-input" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="id_caption" class="form-label">Caption</label>
+                    <textarea name="caption" id="id_caption"
+                        class="form-control"
+                        placeholder="Write a caption..."></textarea>
+                    {% if form.caption.errors %}
+                    <div class="form-error">
+                        {% for error in form.caption.errors %}
+                        {{ error }}
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+                </div>
+
+                <div class="form-group">
+                    <label for="id_location" class="form-label">Location
+                        (optional)</label>
+                    <input type="text" name="location" id="id_location"
+                        class="form-control" placeholder="Add a location">
+                </div>
+            </div>
+
+            <div class="form-footer">
+                <a href="{% url 'home' %}" class="btn-cancel">Cancel</a>
+                <button type="submit" class="btn-submit">
+                    <i class="fas fa-paper-plane"></i>
+                    <span>Share Post</span>
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="loading-overlay" id="loading-overlay">
+    <div class="loading-spinner"></div>
+</div>
+
+<script>
+    // Initialize GSAP animations
+    document.addEventListener('DOMContentLoaded', function() {
+        // Animate page header
+        gsap.from(".page-header", {
+            y: -30,
+            opacity: 0,
+            duration: 0.8,
+            ease: "power2.out"
+        });
+        
+        // Animate form card
+        gsap.from(".form-card", {
+            y: 30,
+            opacity: 0,
+            duration: 0.8,
+            ease: "power2.out",
+            delay: 0.3
+        });
+        
+        // Image preview functionality
+        const imageInput = document.getElementById('id_image');
+        const imagePreview = document.getElementById('image-preview');
+        
+        imageInput.addEventListener('change', function() {
+            if (this.files && this.files[0]) {
+                const reader = new FileReader();
+                
+                reader.onload = function(e) {
+                    // Clear the preview
+                    imagePreview.innerHTML = '';
+                    
+                    // Create image element
+                    const img = document.createElement('img');
+                    img.src = e.target.result;
+                    img.alt = 'Preview';
+                    
+                    // Add to preview
+                    imagePreview.appendChild(img);
+                    
+                    // Animate the image
+                    gsap.from(img, {
+                        opacity: 0,
+                        scale: 0.8,
+                        duration: 0.5,
+                        ease: "back.out(1.7)"
+                    });
+                }
+                
+                reader.readAsDataURL(this.files[0]);
+            }
+        });
+        
+        // Drag and drop functionality
+        imagePreview.addEventListener('dragover', function(e) {
+            e.preventDefault();
+            this.style.backgroundColor = 'rgba(79, 70, 229, 0.1)';
+            this.style.borderColor = 'var(--primary)';
+        });
+        
+        imagePreview.addEventListener('dragleave', function(e) {
+            e.preventDefault();
+            this.style.backgroundColor = '';
+            this.style.borderColor = '';
+        });
+        
+        imagePreview.addEventListener('drop', function(e) {
+            e.preventDefault();
+            this.style.backgroundColor = '';
+            this.style.borderColor = '';
+            
+            if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+                imageInput.files = e.dataTransfer.files;
+                
+                // Trigger change event
+                const event = new Event('change', { bubbles: true });
+                imageInput.dispatchEvent(event);
+            }
+        });
+        
+        // Form submission animation
+        const postForm = document.getElementById('post-form');
+        const loadingOverlay = document.getElementById('loading-overlay');
+        
+        postForm.addEventListener('submit', function(e) {
+            // Show loading overlay
+            loadingOverlay.classList.add('active');
+            
+            // Animate the submit button
+            const submitButton = this.querySelector('.btn-submit');
+            gsap.to(submitButton, {
+                scale: 0.95,
+                duration: 0.2,
+                yoyo: true,
+                repeat: 1
+            });
+        });
+    });
+</script>
+{% endblock %}

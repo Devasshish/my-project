@@ -1,0 +1,406 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ profile_user.username }}'s Profile{% endblock %}
+
+{% block extra_styles %}
+<style>
+    /* Profile Page Styles */
+    .profile-container {
+        max-width: 1000px;
+        margin: 0 auto;
+    }
+    
+    /* Profile Header */
+    .profile-header {
+        background-color: var(--card-bg);
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow-sm);
+        overflow: hidden;
+        margin-bottom: 2rem;
+        position: relative;
+    }
+    
+    .profile-cover {
+        height: 200px;
+        background: linear-gradient(135deg, var(--primary), var(--secondary));
+        position: relative;
+    }
+    
+    .profile-avatar-wrapper {
+        position: absolute;
+        top: 140px;
+        left: 50%;
+        transform: translateX(-50%);
+        z-index: 10;
+    }
+    
+    .profile-avatar {
+        width: 120px;
+        height: 120px;
+        border-radius: var(--radius-full);
+        border: 4px solid var(--card-bg);
+        box-shadow: var(--shadow-md);
+        overflow: hidden;
+        background-color: var(--light);
+    }
+    
+    .profile-avatar img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+    
+    .profile-info {
+        padding: 4rem 2rem 2rem;
+        text-align: center;
+    }
+    
+    .profile-username {
+        font-size: 1.75rem;
+        font-weight: 700;
+        color: var(--dark);
+        margin-bottom: 0.5rem;
+    }
+    
+    .profile-bio {
+        color: var(--gray);
+        margin-bottom: 1.5rem;
+        max-width: 600px;
+        margin-left: auto;
+        margin-right: auto;
+    }
+    
+    .profile-stats {
+        display: flex;
+        justify-content: center;
+        gap: 2rem;
+        margin-bottom: 1.5rem;
+    }
+    
+    .stat-item {
+        text-align: center;
+    }
+    
+    .stat-value {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: var(--dark);
+        margin-bottom: 0.25rem;
+    }
+    
+    .stat-label {
+        font-size: 0.875rem;
+        color: var(--gray);
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+    }
+    
+    .profile-actions {
+        display: flex;
+        justify-content: center;
+        gap: 1rem;
+    }
+    
+    .follow-button {
+        padding: 0.625rem 2rem;
+        border-radius: var(--radius-full);
+        font-weight: 600;
+        font-size: 0.9375rem;
+        transition: var(--transition);
+        border: none;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .follow-button.following {
+        background-color: var(--primary);
+        color: white;
+    }
+    
+    .follow-button.following:hover {
+        background-color: var(--secondary-hover);
+    }
+    
+    .follow-button.not-following {
+        background-color: var(--light);
+        color: var(--dark);
+        border: 1px solid var(--gray-light);
+    }
+    
+    .follow-button.not-following:hover {
+        background-color: var(--gray-light);
+    }
+    
+    /* Posts Grid */
+    .posts-section {
+        margin-top: 2rem;
+    }
+    
+    .section-title {
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: var(--dark);
+        margin-bottom: 1.5rem;
+        position: relative;
+        display: inline-block;
+    }
+    
+    .section-title::after {
+        content: '';
+        position: absolute;
+        bottom: -4px;
+        left: 0;
+        width: 30px;
+        height: 3px;
+        background: var(--primary);
+        border-radius: 3px;
+    }
+    
+    .posts-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+        gap: 1rem;
+    }
+    
+    .post-item {
+        position: relative;
+        border-radius: var(--radius-md);
+        overflow: hidden;
+        aspect-ratio: 1/1;
+        background-color: var(--gray-light);
+        cursor: pointer;
+        /* transition: var(--transition); */
+    }
+    
+    .post-item:hover {
+        transform: scale(1.03);
+        box-shadow: var(--shadow-md);
+    }
+    
+    .post-item img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: var(--transition);
+    }
+    
+    .post-item:hover img {
+        transform: scale(1.1);
+    }
+    
+    .post-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.5);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        opacity: 0;
+        transition: var(--transition);
+    }
+    
+    .post-item:hover .post-overlay {
+        opacity: 1;
+    }
+    
+    .post-stats {
+        display: flex;
+        gap: 1.5rem;
+        color: white;
+        font-weight: 600;
+    }
+    
+    .post-stat {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    /* Empty State */
+    .empty-posts {
+        text-align: center;
+        padding: 3rem 1rem;
+        background-color: var(--card-bg);
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow-sm);
+    }
+    
+    .empty-icon {
+        font-size: 3rem;
+        color: var(--gray);
+        margin-bottom: 1rem;
+    }
+    
+    .empty-title {
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: var(--dark);
+        margin-bottom: 0.5rem;
+    }
+    
+    .empty-text {
+        color: var(--gray);
+        margin-bottom: 1.5rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="profile-container">
+    <!-- Profile Header -->
+    <div class="profile-header">
+        <div class="profile-cover"></div>
+        <div class="profile-avatar-wrapper">
+            <div class="profile-avatar">
+                {% if profile_user.profile_image %}
+                <img src="{{ profile_user.profile_image.url }}"
+                    alt="Profile Image">
+                {% else %}
+                <img src="{% static 'default_profile.png' %}"
+                    alt="Profile Image">
+                {% endif %}
+            </div>
+        </div>
+        <div class="profile-info">
+            <h1 class="profile-username">{{ profile_user.username }}</h1>
+            <p
+                class="profile-bio">{{profile_user.bio|default:"No bio available"}}</p>
+
+            <div class="profile-stats">
+                <div class="stat-item">
+                    <div class="stat-value">{{ followers_count }}</div>
+                    <div class="stat-label">Followers</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value">{{ following_count }}</div>
+                    <div class="stat-label">Following</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value">{{ posts.count }}</div>
+                    <div class="stat-label">Posts</div>
+                </div>
+            </div>
+
+            {% if profile_user != user %}
+            <div class="profile-actions">
+                <form method="post"
+                    action="{% if is_following %}{% url 'unfollow_user' profile_user.username %}{% else %}{% url 'follow_user' profile_user.username %}{% endif %}">
+                    {% csrf_token %}
+                    <button type="submit"
+                        class="follow-button {% if is_following %}following{% else %}not-following{% endif %}">
+                        {% if is_following %}
+                        <i class="fas fa-user-check"></i>
+                        <span>Following</span>
+                        {% else %}
+                        <i class="fas fa-user-plus"></i>
+                        <span>Follow</span>
+                        {% endif %}
+                    </button>
+                </form>
+
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Posts Section -->
+    <div class="posts-section">
+        <h2 class="section-title">Posts</h2>
+
+        {% if posts %}
+        <div class="posts-grid">
+            {% for post in posts %}
+            <div class="post-item">
+                <img src="{{ post.image.url }}" alt="Post Image">
+                <div class="post-overlay">
+                    <div class="post-stats">
+                        <div class="post-stat">
+                            <i class="fas fa-heart"></i>
+                            <span>{{ post.like_count }}</span>
+                        </div>
+                        <div class="post-stat">
+                            <i class="fas fa-comment"></i>
+                            <span>{{ post.comments.count }}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="empty-posts">
+            <div class="empty-icon">
+                <i class="fas fa-camera"></i>
+            </div>
+            <h3 class="empty-title">No Posts Yet</h3>
+            <p class="empty-text">When {{ profile_user.username }} shares
+                photos, you'll see them here.</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<script>
+    // Initialize GSAP animations
+    document.addEventListener('DOMContentLoaded', function() {
+        // Animate profile header elements
+        gsap.from(".profile-cover", {
+            opacity: 0,
+            duration: 1,
+            ease: "power2.out"
+        });
+        
+        gsap.from(".profile-avatar", {
+            y: 30,
+            opacity: 0,
+            duration: 1,
+            ease: "back.out(1.7)",
+            delay: 0.3
+        });
+        
+        gsap.from(".profile-info > *", {
+            y: 20,
+            opacity: 0,
+            stagger: 0.2,
+            duration: 0.8,
+            ease: "power2.out",
+            delay: 0.6
+        });
+        
+        // Animate posts grid with stagger
+        gsap.from(".post-item", {
+            scale: 0.8,
+            opacity: 0,
+            stagger: 0.1,
+            duration: 0.6,
+            ease: "back.out(1.5)",
+            delay: 1,
+            scrollTrigger: {
+                trigger: ".posts-section",
+                start: "top bottom-=100",
+                toggleActions: "play none none none"
+            }
+        });
+        
+        // Follow button animation
+        const followButton = document.querySelector('.follow-button');
+        if (followButton) {
+            followButton.addEventListener('click', function() {
+                gsap.to(this, {
+                    scale: 0.9,
+                    duration: 0.1,
+                    yoyo: true,
+                    repeat: 1,
+                    ease: "power2.inOut"
+                });
+            });
+        }
+    });
+</script>
+{% endblock %}

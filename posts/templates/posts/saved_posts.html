@@ -1,0 +1,361 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Saved Posts - SocialSphere{% endblock %}
+
+{% block extra_styles %}
+<style>
+    /* Feed Layout */
+    .feed-container {
+        max-width: 800px;
+        margin: 0 auto;
+    }
+    
+    .feed-header {
+        margin-bottom: 1.5rem;
+    }
+    
+    .feed-title {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: var(--dark);
+        margin-bottom: 0.5rem;
+        position: relative;
+        display: inline-block;
+    }
+    
+    .feed-title::after {
+        content: '';
+        position: absolute;
+        bottom: -4px;
+        left: 0;
+        width: 40px;
+        height: 3px;
+        background: var(--primary);
+        border-radius: 3px;
+    }
+    
+    /* Post Card */
+    .post-card {
+        background-color: var(--card-bg);
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow-sm);
+        overflow: hidden;
+        margin-bottom: 1.5rem;
+        /* transition: var(--transition); */
+        border: 1px solid var(--gray-light);
+    }
+    
+    .post-card:hover {
+        box-shadow: var(--shadow-md);
+        transform: translateY(-2px);
+    }
+    
+    .post-header {
+        padding: 1rem;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        border-bottom: 1px solid var(--gray-light);
+    }
+    
+    .post-avatar {
+        width: 40px;
+        height: 40px;
+        border-radius: var(--radius-full);
+        overflow: hidden;
+        flex-shrink: 0;
+    }
+    
+    .post-avatar img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+    
+    .post-user {
+        flex: 1;
+    }
+    
+    .post-username {
+        font-weight: 600;
+        color: var(--dark);
+        text-decoration: none;
+        font-size: 0.9375rem;
+        transition: var(--transition);
+    }
+    
+    .post-username:hover {
+        color: var(--primary);
+    }
+    
+    .post-time {
+        font-size: 0.75rem;
+        color: var(--gray);
+    }
+    
+    .post-image-container {
+        position: relative;
+        overflow: hidden;
+        background-color: var(--gray-light);
+        aspect-ratio: 1 / 1;
+        max-height: 500px;
+    }
+    
+    .post-image {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.5s ease;
+    }
+    
+    .post-card:hover .post-image {
+        transform: scale(1.02);
+    }
+    
+    .post-content {
+        padding: 1rem;
+    }
+    
+    .post-caption {
+        margin-bottom: 1rem;
+        font-size: 0.9375rem;
+        color: var(--dark);
+        line-height: 1.5;
+    }
+    
+    .post-actions {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        padding: 0.5rem 1rem 1rem;
+    }
+    
+    .post-action {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        color: var(--gray);
+        font-size: 0.875rem;
+        transition: var(--transition);
+        cursor: pointer;
+        background: none;
+        border: none;
+        padding: 0.5rem;
+        border-radius: var(--radius-md);
+    }
+    
+    .post-action:hover {
+        color: var(--primary);
+        background-color: rgba(79, 70, 229, 0.05);
+    }
+    
+    .post-action.unsave {
+        color: var(--secondary);
+    }
+    
+    .post-action i {
+        font-size: 1.125rem;
+    }
+    
+    /* Empty state */
+    .empty-state {
+        text-align: center;
+        padding: 3rem 1rem;
+        background-color: var(--card-bg);
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow-sm);
+    }
+    
+    .empty-icon {
+        font-size: 3rem;
+        color: var(--gray);
+        margin-bottom: 1rem;
+    }
+    
+    .empty-title {
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: var(--dark);
+        margin-bottom: 0.5rem;
+    }
+    
+    .empty-text {
+        color: var(--gray);
+        margin-bottom: 1.5rem;
+    }
+    
+    /* Animation for unsave button */
+    @keyframes fadeOut {
+        0% { opacity: 1; transform: scale(1); }
+        100% { opacity: 0; transform: scale(0.8); }
+    }
+    
+    .fade-out {
+        animation: fadeOut 0.5s forwards;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="feed-container">
+    <div class="feed-header">
+        <h1 class="feed-title">Saved Posts</h1>
+        <p class="text-gray fs-sm">Posts you've saved for later</p>
+    </div>
+
+    {% if saved_posts %}
+    <div class="posts-container">
+        {% for saved_post in saved_posts %}
+        <div class="post-card" id="post-card-{{ saved_post.post.id }}"
+            data-post-id="{{ saved_post.post.id }}">
+            <!-- User Info Section -->
+            <div class="post-header">
+                <div class="post-avatar">
+                    {% if saved_post.post.user.profile_image %}
+                    <img src="{{ saved_post.post.user.profile_image.url }}"
+                        alt="Profile Image">
+                    {% else %}
+                    <img src="{% static 'default_profile.png' %}"
+                        alt="Profile Image">
+                    {% endif %}
+                </div>
+                <div class="post-user">
+                    <a
+                        href="{% url 'user_profile' saved_post.post.user.username %}"
+                        class="post-username">
+                        {{saved_post.post.user.username|default:"Unknown User"}}
+                    </a>
+                    <div
+                        class="post-time">{{saved_post.post.created_at|timesince}}
+                        ago</div>
+                </div>
+            </div>
+
+            <!-- Post Image -->
+            <div class="post-image-container">
+                <img src="{{ saved_post.post.image.url }}" alt="Post Image"
+                    class="post-image">
+            </div>
+
+            <!-- Post Content -->
+            <div class="post-content">
+                <p
+                    class="post-caption">{{saved_post.post.caption|default:"No caption provided"}}</p>
+            </div>
+
+            <!-- Post Actions (Only Unsave) -->
+            <div class="post-actions">
+                <form method="post"
+                    action="{% url 'unsave_post' saved_post.post.id %}"
+                    id="unsave-form-{{ saved_post.post.id }}" class="d-inline">
+                    {% csrf_token %}
+                    <button type="button" class="post-action unsave"
+                        onclick="submitUnsave(event, {{ saved_post.post.id }})">
+                        <i class="fas fa-bookmark"></i>
+                        <span>Unsave</span>
+                    </button>
+                </form>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="empty-state">
+        <div class="empty-icon">
+            <i class="fas fa-bookmark"></i>
+        </div>
+        <h3 class="empty-title">No Saved Posts</h3>
+        <p class="empty-text">You haven't saved any posts yet. Browse the feed
+            and save posts to view them here later.</p>
+        <a href="{% url 'home' %}" class="btn btn-primary">
+            <i class="fas fa-home"></i>
+            Go to Feed
+        </a>
+    </div>
+    {% endif %}
+</div>
+
+<script>
+    // Initialize GSAP animations
+    document.addEventListener('DOMContentLoaded', function() {
+        // Animate feed header
+        gsap.from(".feed-header", {
+            y: -20,
+            opacity: 0,
+            duration: 0.8,
+            ease: "power2.out"
+        });
+        
+        // Animate post cards with stagger
+        gsap.from(".post-card", {
+            y: 30,
+            opacity: 0,
+            duration: 0.8,
+            stagger: 0.2,
+            ease: "power2.out",
+            delay: 0.3
+        });
+    });
+
+    function submitUnsave(event, postId) {
+        event.preventDefault();
+        const form = document.getElementById(`unsave-form-${postId}`);
+        const postCard = document.getElementById(`post-card-${postId}`);
+        const data = new FormData(form);
+        
+        // Add fade-out animation to the post card
+        postCard.classList.add('fade-out');
+        
+        fetch(form.action, {
+            method: "POST",
+            headers: { "X-CSRFToken": getCookie("csrftoken") },
+            body: data,
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === "success") {
+                // Remove the post card after animation completes
+                setTimeout(() => {
+                    postCard.remove();
+                    
+                    // Check if there are any posts left
+                    const remainingPosts = document.querySelectorAll('.post-card');
+                    if (remainingPosts.length === 0) {
+                        // If no posts left, show empty state
+                        const postsContainer = document.querySelector('.posts-container');
+                        postsContainer.innerHTML = `
+                            <div class="empty-state">
+                                <div class="empty-icon">
+                                    <i class="fas fa-bookmark"></i>
+                                </div>
+                                <h3 class="empty-title">No Saved Posts</h3>
+                                <p class="empty-text">You haven't saved any posts yet. Browse the feed and save posts to view them here later.</p>
+                                <a href="{% url 'home' %}" class="btn btn-primary">
+                                    <i class="fas fa-home"></i>
+                                    Go to Feed
+                                </a>
+                            </div>
+                        `;
+                    }
+                }, 500);
+            }
+        });
+    }
+
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== "") {
+            const cookies = document.cookie.split(";");
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === name + "=") {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+</script>
+{% endblock %}

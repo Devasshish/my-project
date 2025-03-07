@@ -1,0 +1,130 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+}
+
+/* Sticky header */
+header {
+    /* background-color: #333; */
+    color: white;
+    padding: 10px 20px;
+    position: sticky;
+    top: 0;
+    width: 100%;
+    /* z-index: 1000; */
+}
+
+/* Reorganize top navigation */
+header nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+header nav ul {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+}
+
+header nav ul li {
+    display: inline-block;
+    margin-left: 20px;
+}
+
+header nav ul li a {
+    color: white;
+    text-decoration: none;
+    font-size: 16px;
+}
+
+/* Sidebar styling */
+aside {
+    width: 200px;
+    position: sticky;
+    top: 60px;
+    /* Adjust this if the header height changes */
+    padding: 10px;
+    background-color: #f4f4f4;
+    height: 80vh;
+    float: left;
+}
+
+aside ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+aside ul li {
+    margin-bottom: 10px;
+}
+
+aside ul li a {
+    text-decoration: none;
+    color: #333;
+    font-size: 16px;
+}
+
+/* Main content area */
+main {
+    margin-left: 220px;
+    padding: 20px;
+}
+
+/* Post styling */
+.post {
+    border: 1px solid #ddd;
+    padding: 10px;
+    margin-bottom: 20px;
+}
+
+/* Fixed image-post size */
+.post img {
+    width: 500px;
+    height: 400px;
+    object-fit: cover;
+}
+
+/* Post actions styling */
+.post-actions {
+    display: flex;
+    justify-content: space-around;
+}
+
+/* Profile styling */
+.profile {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 20px;
+}
+
+.profile-image {
+    flex: 1;
+    text-align: center;
+}
+
+.profile-info {
+    flex: 2;
+}
+
+.profile-image img {
+    border-radius: 50%;
+    width: 150px;
+    height: 150px;
+}
+
+.profile-info form {
+    display: flex;
+    flex-direction: column;
+}
+
+.user-info {
+    display: flex;
+    gap: 10px;
+}
+
+.user-info img {
+    width: 50px;
+    height: 50px;
+}

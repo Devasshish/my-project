@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Register</title>
+        <link
+            href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap"
+            rel="stylesheet">
+        <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .register-container {
+            position: relative;
+            width: 500px; /* Increased width */
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+            padding: 40px;
+            backdrop-filter: blur(10px);
+            transform-style: preserve-3d;
+            transition: all 0.3s ease;
+        }
+
+        .register-container:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .register-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .register-header h2 {
+            color: #333;
+            font-size: 2.2rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .register-header p {
+            color: #666;
+            font-size: 0.95rem;
+        }
+
+        .register-form .input-group {
+            position: relative;
+            margin-bottom: 1.5rem;
+        }
+
+        .register-form .input-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: #333;
+        }
+
+        .register-form .input-group input,
+        .register-form .input-group textarea {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            font-size: 1rem;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        .register-form .input-group input:focus,
+        .register-form .input-group textarea:focus {
+            border-color: #2563eb;
+            box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1);
+        }
+
+        .register-form .input-group textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .register-form .input-group .file-input {
+            padding: 0.5rem;
+            background: #f5f5f5;
+            border-radius: 12px;
+            cursor: pointer;
+        }
+
+        .register-form .button {
+            width: 100%;
+            padding: 0.75rem;
+            background-color: #2563eb;
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .register-form .button:hover {
+            background-color: #3b82f6;
+        }
+
+        .login-link {
+            margin-top: 1.5rem;
+            text-align: center;
+            color: #666;
+        }
+
+        .login-link a {
+            color: #2563eb;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .login-link a:hover {
+            text-decoration: underline;
+        }
+
+        @media (max-width: 480px) {
+            .register-container {
+                width: 90%;
+                padding: 2rem;
+            }
+        }
+    </style>
+    </head>
+    <body>
+        <div class="register-container">
+            <div class="register-header">
+                <h2>Create Account</h2>
+                <p>Join our community today</p>
+            </div>
+
+            <form method="post" id="registerForm" class="register-form"
+                enctype="multipart/form-data">
+                {% csrf_token %}
+                {% if form.errors %}
+                <div class="alert alert-danger">
+                    {% for field in form %}
+                    {% for error in field.errors %}
+                    <p>{{ error }}</p>
+                    {% endfor %}
+                    {% endfor %}
+                    {% for error in form.non_field_errors %}
+                    <p>{{ error }}</p>
+                    {% endfor %}
+                </div>
+                {% endif %}
+
+                <!-- Username -->
+                <div class="input-group">
+                    <label for="id_username">Username</label>
+                    <input type="text" id="id_username" name="username"
+                        placeholder="Enter your username" required>
+                </div>
+
+                <!-- Bio -->
+                <div class="input-group">
+                    <label for="id_bio">Bio</label>
+                    <textarea id="id_bio" name="bio"
+                        placeholder="Tell us about yourself"></textarea>
+                </div>
+
+                <!-- Profile Image -->
+                <div class="input-group">
+                    <label for="id_profile_image">Profile Image</label>
+                    <input type="file" id="id_profile_image"
+                        name="profile_image" class="file-input"
+                        accept="image/*">
+                </div>
+
+                <!-- Password -->
+                <div class="input-group">
+                    <label for="id_password1">Password</label>
+                    <input type="password" id="id_password1" name="password1"
+                        placeholder="Enter your password" required>
+                </div>
+
+                <!-- Password Confirmation -->
+                <div class="input-group">
+                    <label for="id_password2">Password Confirmation</label>
+                    <input type="password" id="id_password2" name="password2"
+                        placeholder="Confirm your password" required>
+                </div>
+
+                <!-- Submit Button -->
+                <button type="submit" class="button" id="registerButton">Create
+                    Account</button>
+            </form>
+
+            <p class="login-link">
+                Already have an account? <a href="{% url 'login' %}">Login
+                    here</a>
+            </p>
+        </div>
+
+        <script>
+        // Form submission handling
+        document.getElementById('registerForm').addEventListener('submit', function(e) {
+            const registerButton = document.getElementById('registerButton');
+            registerButton.disabled = true;
+            registerButton.innerHTML = 'Creating Account...';
+        });
+    </script>
+    </body>
+</html>

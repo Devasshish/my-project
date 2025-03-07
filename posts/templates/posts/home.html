@@ -1,0 +1,940 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Home - SocialSphere{% endblock %}
+
+{% block extra_styles %}
+<style>
+    /* Feed Layout */
+    .feed-container {
+        max-width: 1200px;
+        margin: 0 auto;
+    }
+    
+    .feed-header {
+        margin-bottom: 1.5rem;
+    }
+    
+    .feed-title {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: var(--dark);
+        margin-bottom: 0.5rem;
+        position: relative;
+        display: inline-block;
+    }
+    
+    .feed-title::after {
+        content: '';
+        position: absolute;
+        bottom: -4px;
+        left: 0;
+        width: 40px;
+        height: 3px;
+        background: var(--primary);
+        border-radius: 3px;
+    }
+    
+    /* Post Card */
+    .post-card {
+        background-color: var(--card-bg);
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow-sm);
+        overflow: hidden;
+        margin-bottom: 1.5rem;
+        border: 1px solid var(--gray-light);
+        display: flex;
+        flex-direction: column;
+    }
+    
+    @media (min-width: 992px) {
+        .post-card {
+            flex-direction: row;
+        }
+        
+        .post-main-content {
+            flex: 0 0 60%; /* Changed to 60% width */
+            max-width: 60%; /* Max-width set to 60% */
+        }
+        
+        .comments-section-desktop {
+            width: 40%; /* Changed to 40% width */
+            flex: 0 0 40%; /* Flex basis set to 40% */
+            border-left: 1px solid var(--gray-light);
+            display: flex;
+            flex-direction: column;
+            max-height: none;
+        }
+        
+        .comments-list-container {
+            max-height: 500px; /* Fixed height for scrolling */
+            overflow-y: auto;
+            padding: 0 1rem;
+            flex: 1; /* Ensure it takes up the remaining space */
+        }
+        
+        .post-action[onclick^="toggleComments"] {
+            pointer-events: none; /* Disable pointer events on desktop */
+            opacity: 0.5; /* Dim the button to indicate it's not clickable */
+            cursor: default; /* Change cursor to default */
+        }
+    }
+    
+    .post-card:hover {
+        box-shadow: var(--shadow-md);
+        transform: translateY(-2px);
+    }
+    
+    .post-main-content {
+        display: flex;
+        flex-direction: column;
+    }
+    
+    .post-header {
+        padding: 1rem;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        border-bottom: 1px solid var(--gray-light);
+    }
+    
+    .post-avatar {
+        width: 40px;
+        height: 40px;
+        border-radius: var(--radius-full);
+        overflow: hidden;
+        flex-shrink: 0;
+    }
+    
+    .post-avatar img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+    
+    .post-user {
+        flex: 1;
+    }
+    
+    .post-username {
+        font-weight: 600;
+        color: var(--dark);
+        text-decoration: none;
+        font-size: 0.9375rem;
+        transition: var(--transition);
+    }
+    
+    .post-username:hover {
+        color: var(--primary);
+    }
+    
+    .post-time {
+        font-size: 0.75rem;
+        color: var(--gray);
+    }
+    
+    .post-image-container {
+        position: relative;
+        overflow: hidden;
+        background-color: var(--gray-light);
+        aspect-ratio: 1 / 1;
+        max-height: 500px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .post-image {
+        height: 100%;
+        object-fit: cover;
+        object-position: center;
+        transition: transform 0.5s ease;
+    }
+    
+    .post-card:hover .post-image {
+        transform: scale(1.02);
+    }
+    
+    .post-content {
+        padding: 1rem;
+    }
+    
+    .post-caption {
+        font-size: 0.9375rem;
+        color: var(--dark);
+        line-height: 1.5;
+    }
+    
+    .post-actions {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        padding: 0.5rem 1rem 1rem;
+    }
+    
+    .post-action {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        color: var(--gray);
+        font-size: 0.875rem;
+        transition: var(--transition);
+        cursor: pointer;
+        background: none;
+        border: none;
+        padding: 0.5rem;
+        border-radius: var(--radius-md);
+    }
+    
+    .post-action:hover {
+        color: var(--primary);
+        background-color: rgba(79, 70, 229, 0.05);
+    }
+    
+    .post-action.liked {
+        color: var(--secondary);
+    }
+    
+    .post-action.saved {
+        color: var(--primary);
+    }
+    
+    .post-action i {
+        font-size: 1.125rem;
+    }
+    
+    /* Comments */
+    .comments-section {
+        padding: 1rem;
+        border-top: 1px solid var(--gray-light);
+        max-height: 300px;
+        overflow-y: auto;
+        display: none;
+    }
+    
+    .comments-section-desktop {
+        padding: 0;
+        display: none;
+    }
+    
+    .comments-section-desktop .comments-header {
+        padding: 1.65rem;
+        margin-bottom: 0;
+        border-bottom: 1px solid var(--gray-light);
+        font-weight: 600;
+        font-size: 0.9375rem;
+        color: var(--dark);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        position: sticky;
+        top: 0;
+        background-color: var(--card-bg);
+        z-index: 1;
+    }
+    
+    .comment-form-container {
+        padding: 1rem;
+        border-top: 1px solid var(--gray-light);
+        background-color: var(--card-bg);
+        position: sticky;
+        bottom: 0;
+        z-index: 1;
+    }
+    
+    .comment-form {
+        display: flex;
+        gap: 0.75rem;
+        margin-bottom: 0;
+    }
+    
+    .comment-input {
+        flex: 1;
+        padding: 0.75rem 1rem;
+        border: 1px solid var(--gray-light);
+        border-radius: var(--radius-full);
+        font-size: 0.875rem;
+        transition: var(--transition);
+    }
+    
+    .comment-input:focus {
+        outline: none;
+        border-color: var(--primary);
+        box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.2);
+    }
+    
+    .comment-submit {
+        background-color: var(--primary);
+        color: white;
+        border: none;
+        border-radius: var(--radius-full);
+        padding: 0.5rem 1rem;
+        font-weight: 500;
+        font-size: 0.875rem;
+        cursor: pointer;
+        transition: var(--transition);
+    }
+    
+    .comment-submit:hover {
+        background-color: var(--primary-hover);
+    }
+    
+    .comment {
+        padding: 0.75rem;
+        border-radius: var(--radius-md);
+        background-color: var(--light);
+        margin-bottom: 0.75rem;
+    }
+    
+    .comment-header {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        margin-bottom: 0.5rem;
+    }
+    
+    .comment-avatar {
+        width: 32px;
+        height: 32px;
+        border-radius: var(--radius-full);
+        overflow: hidden;
+    }
+    
+    .comment-avatar img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+    
+    .comment-user {
+        font-weight: 600;
+        font-size: 0.875rem;
+        color: var(--dark);
+        text-decoration: none;
+    }
+    
+    .comment-user:hover {
+        color: var(--primary);
+    }
+    
+    .comment-time {
+        font-size: 0.75rem;
+        color: var(--gray);
+        margin-left: auto;
+    }
+    
+    .comment-content {
+        font-size: 0.875rem;
+        color: var(--dark);
+        line-height: 1.5;
+    }
+    
+    .comment-actions {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        margin-top: 0.5rem;
+    }
+    
+    .comment-action {
+        font-size: 0.75rem;
+        color: var(--gray);
+        cursor: pointer;
+        transition: var(--transition);
+        background: none;
+        border: none;
+        padding: 0;
+    }
+    
+    .comment-action:hover {
+        color: var(--primary);
+    }
+    
+    .replies {
+        margin-left: 2rem;
+        margin-top: 0.75rem;
+    }
+    
+    /* Empty state */
+    .empty-state {
+        text-align: center;
+        padding: 3rem 1rem;
+        background-color: var(--card-bg);
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow-sm);
+    }
+    
+    .empty-icon {
+        font-size: 3rem;
+        color: var(--gray);
+        margin-bottom: 1rem;
+    }
+    
+    .empty-title {
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: var(--dark);
+        margin-bottom: 0.5rem;
+    }
+    
+    .empty-text {
+        color: var(--gray);
+        margin-bottom: 1.5rem;
+    }
+    
+    /* Scrollbar styling */
+    .comments-list-container::-webkit-scrollbar {
+        width: 6px;
+    }
+    
+    .comments-list-container::-webkit-scrollbar-track {
+        background: rgba(0, 0, 0, 0.05);
+        border-radius: 10px;
+    }
+    
+    .comments-list-container::-webkit-scrollbar-thumb {
+        background: rgba(0, 0, 0, 0.2);
+        border-radius: 10px;
+    }
+    
+    .comments-list-container::-webkit-scrollbar-thumb:hover {
+        background: rgba(0, 0, 0, 0.3);
+    }
+    
+    /* Loading animation */
+    .loading-spinner {
+        display: inline-block;
+        width: 40px;
+        height: 40px;
+        border: 3px solid rgba(79, 70, 229, 0.2);
+        border-radius: 50%;
+        border-top-color: var(--primary);
+        animation: spin 1s ease-in-out infinite;
+    }
+    
+    @keyframes spin {
+        to { transform: rotate(360deg); }
+    }
+    
+    /* Like animation */
+    @keyframes heartBeat {
+        0% { transform: scale(1); }
+        14% { transform: scale(1.3); }
+        28% { transform: scale(1); }
+        42% { transform: scale(1.3); }
+        70% { transform: scale(1); }
+    }
+    
+    .heart-beat {
+        animation: heartBeat 1s;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="feed-container">
+    <div class="feed-header">
+        <h1 class="feed-title">Your Feed</h1>
+        <p class="text-gray fs-sm">See what's happening in your network</p>
+    </div>
+
+    {% if posts %}
+    <div class="posts-container">
+        {% for post in posts %}
+        <div class="post-card" data-post-id="{{ post.id }}">
+            <div class="post-main-content">
+                <!-- User Info Section -->
+                <div class="post-header">
+                    <div class="post-avatar">
+                        {% if post.user.profile_image %}
+                        <img src="{{ post.user.profile_image.url }}"
+                            alt="Profile Image">
+                        {% else %}
+                        <img src="{% static 'default_profile.png' %}"
+                            alt="Profile Image">
+                        {% endif %}
+                    </div>
+                    <div class="post-user">
+                        <a href="{% url 'user_profile' post.user.username %}"
+                            class="post-username">
+                            {{ post.user.username|default:"Unknown User" }}
+                        </a>
+                        <div class="post-time">{{ post.created_at|timesince }}
+                            ago</div>
+                    </div>
+                </div>
+
+                <!-- Post Image -->
+                <div class="post-image-container">
+                    <img src="{{ post.image.url }}" alt="Post Image"
+                        class="post-image">
+                </div>
+
+                <!-- Post Content -->
+                <div class="post-content">
+                    <p class="post-caption">
+                        {{post.caption|default:"No caption provided" }}</p>
+                </div>
+
+                <!-- Post Actions -->
+                <div class="post-actions">
+                    <form method="post" action="{% url 'like_post' post.id %}"
+                        id="like-form-{{ post.id }}" class="d-inline">
+                        {% csrf_token %}
+                        <button type="button"
+                            class="post-action {% if post.is_liked %}liked{% endif %}"
+                            onclick="submitLike(event, {{ post.id }})">
+                            <i class="fas fa-heart"></i>
+                            <span
+                                id="like-count-{{ post.id }}">{{post.like_count}}</span>
+                        </button>
+                    </form>
+
+                    <button type="button" class="post-action"
+                        onclick="toggleComments({{ post.id }})">
+                        <i class="fas fa-comment"></i>
+                        <span
+                            id="comment-count-{{ post.id }}">{{post.comments.count}}</span>
+                    </button>
+
+                    <form method="post" action="{% url 'save_post' post.id %}"
+                        id="save-form-{{ post.id }}" class="d-inline ms-auto">
+                        {% csrf_token %}
+                        <button type="button"
+                            class="post-action {% if post.is_saved %}saved{% endif %}"
+                            onclick="submitSave(event, {{ post.id }})">
+                            <i class="fas fa-bookmark"></i>
+                            <span>Save</span>
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Comments Section (Mobile - Initially Hidden) -->
+                <div id="comments-section-{{ post.id }}"
+                    class="comments-section">
+                    {% if user.is_authenticated %}
+                    <form method="post" action="{% url 'add_comment' post.id %}"
+                        class="comment-form"
+                        onsubmit="submitComment(event, {{ post.id }})">
+                        {% csrf_token %}
+                        <input type="text" name="content" class="comment-input"
+                            placeholder="Write a comment..." required>
+                        <button type="submit"
+                            class="comment-submit">Post</button>
+                    </form>
+                    {% endif %}
+
+                    <div id="comments-list-mobile-{{ post.id }}"
+                        class="comments-list">
+                        {% for comment in post.comments.all %}
+                        {% if not comment.parent %}
+                        <div class="comment"
+                            id="comment-mobile-{{ comment.id }}">
+                            <div class="comment-header">
+                                <div class="comment-avatar">
+                                    {% if comment.user.profile_image %}
+                                    <img
+                                        src="{{ comment.user.profile_image.url }}"
+                                        alt="Profile Image">
+                                    {% else %}
+                                    <img
+                                        src="{% static 'default_profile.png' %}"
+                                        alt="Profile Image">
+                                    {% endif %}
+                                </div>
+                                <a
+                                    href="{% url 'user_profile' comment.user.username %}"
+                                    class="comment-user">
+                                    {{ comment.user.username }}
+                                </a>
+                                <span class="comment-time">
+                                    {{ comment.created_at|timesince }}
+                                    ago</span>
+                            </div>
+                            <div class="comment-content">
+                                {{ comment.content }}
+                            </div>
+                        </div>
+                        {% endif %}
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Comments Section (Desktop - Always visible on large screens) -->
+            <div id="comments-section-desktop-{{ post.id }}"
+                class="comments-section-desktop">
+                <div class="comments-header">
+                    <span>Comments ({{ post.comments.count }})</span>
+                </div>
+
+                <div class="comments-list-container">
+                    <div id="comments-list-desktop-{{ post.id }}"
+                        class="comments-list">
+                        {% for comment in post.comments.all %}
+                        {% if not comment.parent %}
+                        <div class="comment"
+                            id="comment-desktop-{{ comment.id }}">
+                            <div class="comment-header">
+                                <div class="comment-avatar">
+                                    {% if comment.user.profile_image %}
+                                    <img
+                                        src="{{ comment.user.profile_image.url }}"
+                                        alt="Profile Image">
+                                    {% else %}
+                                    <img
+                                        src="{% static 'default_profile.png' %}"
+                                        alt="Profile Image">
+                                    {% endif %}
+                                </div>
+                                <a
+                                    href="{% url 'user_profile' comment.user.username %}"
+                                    class="comment-user">
+                                    {{ comment.user.username }}
+                                </a>
+                                <span class="comment-time">
+                                    {{ comment.created_at|timesince }}
+                                    ago</span>
+                            </div>
+                            <div class="comment-content">
+                                {{ comment.content }}
+                            </div>
+                        </div>
+                        {% endif %}
+                        {% endfor %}
+                    </div>
+                </div>
+
+                {% if user.is_authenticated %}
+                <div class="comment-form-container">
+                    <form method="post" action="{% url 'add_comment' post.id %}"
+                        class="comment-form"
+                        onsubmit="submitCommentDesktop(event, {{ post.id }})">
+                        {% csrf_token %}
+                        <input type="text" name="content" class="comment-input"
+                            placeholder="Write a comment..." required>
+                        <button type="submit"
+                            class="comment-submit">Post</button>
+                    </form>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="empty-state">
+        <div class="empty-icon">
+            <i class="fas fa-photo-video"></i>
+        </div>
+        <h3 class="empty-title">No Posts Yet</h3>
+        <p class="empty-text">Follow more users or create your first post to see
+            content here.</p>
+        <a href="{% url 'create_post' %}" class="btn btn-primary">
+            <i class="fas fa-plus"></i>
+            Create Post
+        </a>
+    </div>
+    {% endif %}
+</div>
+
+<script>
+    // Initialize GSAP animations
+    document.addEventListener('DOMContentLoaded', function() {
+        // Animate feed header
+        gsap.from(".feed-header", {
+            y: -20,
+            opacity: 0,
+            duration: 0.8,
+            ease: "power2.out"
+        });
+        
+        // Animate post cards with stagger
+        gsap.from(".post-card", {
+            y: 30,
+            opacity: 0,
+            duration: 0.8,
+            stagger: 0.2,
+            ease: "power2.out",
+            delay: 0.3
+        });
+        
+        // Show desktop comments section on large screens
+        function handleScreenSize() {
+            const desktopCommentSections = document.querySelectorAll('.comments-section-desktop');
+            if (window.innerWidth >= 992) {
+                desktopCommentSections.forEach(section => {
+                    section.style.display = 'flex';
+                });
+            } else {
+                desktopCommentSections.forEach(section => {
+                    section.style.display = 'none';
+                });
+            }
+        }
+        
+        // Initial check
+        handleScreenSize();
+        
+        // Listen for window resize
+        window.addEventListener('resize', handleScreenSize);
+    });
+
+    function toggleComments(postId) {
+        // Check if the screen width is less than 992px (mobile view)
+        if (window.innerWidth < 992) {
+            const commentsSection = document.getElementById(`comments-section-${postId}`);
+            
+            if (commentsSection.style.display === "block") {
+                gsap.to(commentsSection, {
+                    height: 0,
+                    opacity: 0,
+                    duration: 0.3,
+                    ease: "power2.out",
+                    onComplete: function() {
+                        commentsSection.style.display = "none";
+                    }
+                });
+            } else {
+                commentsSection.style.display = "block";
+                gsap.fromTo(commentsSection, 
+                    { height: 0, opacity: 0 },
+                    { 
+                        height: "auto", 
+                        opacity: 1, 
+                        duration: 0.5, 
+                        ease: "power2.out" 
+                    }
+                );
+            }
+        }
+    }
+
+    function submitLike(event, postId) {
+        event.preventDefault();
+        const form = document.getElementById(`like-form-${postId}`);
+        const button = form.querySelector('button');
+        const icon = button.querySelector('i');
+        const data = new FormData(form);
+        
+        // Add heart beat animation
+        icon.classList.add('heart-beat');
+        
+        fetch(form.action, {
+            method: "POST",
+            headers: { "X-CSRFToken": getCookie("csrftoken") },
+            body: data,
+        })
+        .then(response => response.json())
+        .then(data => {
+            const likeCountElement = document.querySelector(`#like-count-${postId}`);
+            likeCountElement.innerHTML = data.like_count;
+            
+            if (data.liked) {
+                button.classList.add('liked');
+            } else {
+                button.classList.remove('liked');
+            }
+            
+            // Remove animation class after animation completes
+            setTimeout(() => {
+                icon.classList.remove('heart-beat');
+            }, 1000);
+        });
+    }
+
+    // Add double-click like functionality
+    document.addEventListener('DOMContentLoaded', function() {
+        const postImages = document.querySelectorAll('.post-image');
+        postImages.forEach(image => {
+            image.addEventListener('dblclick', function() {
+                const postId = this.closest('.post-card').dataset.postId;
+                const likeForm = document.getElementById(`like-form-${postId}`);
+                const likeButton = likeForm.querySelector('button');
+                likeButton.click();
+            });
+        });
+    });
+
+    function submitSave(event, postId) {
+        event.preventDefault();
+        const form = document.getElementById(`save-form-${postId}`);
+        const button = form.querySelector('button');
+        const data = new FormData(form);
+        
+        fetch(form.action, {
+            method: "POST",
+            headers: { "X-CSRFToken": getCookie("csrftoken") },
+            body: data,
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.saved) {
+                button.classList.add('saved');
+                // Animate the bookmark icon
+                gsap.fromTo(button.querySelector('i'), 
+                    { scale: 1 },
+                    { scale: 1.3, duration: 0.3, yoyo: true, repeat: 1 }
+                );
+            } else {
+                button.classList.remove('saved');
+            }
+        });
+    }
+
+    function submitComment(event, postId) {
+        event.preventDefault();
+
+        const form = event.target;
+        const formData = new FormData(form);
+        const commentsListMobile = document.getElementById(`comments-list-mobile-${postId}`);
+        const commentsListDesktop = document.getElementById(`comments-list-desktop-${postId}`);
+        const commentCountElements = document.querySelectorAll(`#comment-count-${postId}`);
+
+        fetch(form.action, {
+            method: "POST",
+            body: formData,
+            headers: {
+                "X-Requested-With": "XMLHttpRequest"
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === "success") {
+                // Create new comment element for mobile
+                const newCommentMobile = document.createElement("div");
+                newCommentMobile.classList.add("comment");
+                newCommentMobile.id = `comment-mobile-${data.comment_id}`;
+                newCommentMobile.innerHTML = `
+                    <div class="comment-header">
+                        <div class="comment-avatar">
+                            <img src="${data.user_image || '{% static "default_profile.png" %}'}" alt="Profile Image">
+                        </div>
+                        <a href="/profile/${data.user}" class="comment-user">${data.user}</a>
+                        <span class="comment-time">just now</span>
+                    </div>
+                    <div class="comment-content">${data.content}</div>
+                `;
+
+                // Append the new comment to the mobile comment list
+                commentsListMobile.prepend(newCommentMobile);
+                
+                // Create new comment for desktop view too
+                const newCommentDesktop = document.createElement("div");
+                newCommentDesktop.classList.add("comment");
+                newCommentDesktop.id = `comment-desktop-${data.comment_id}`;
+                newCommentDesktop.innerHTML = newCommentMobile.innerHTML;
+                
+                // Append to desktop list
+                commentsListDesktop.prepend(newCommentDesktop);
+                
+                // Update the comment count dynamically
+                commentCountElements.forEach(el => {
+                    el.textContent = data.comment_count;
+                });
+                
+                // Update desktop comments header
+                const commentsHeader = document.querySelector(`#comments-section-desktop-${postId} .comments-header span`);
+                if (commentsHeader) {
+                    commentsHeader.textContent = `Comments (${data.comment_count})`;
+                }
+
+                // Clear the form
+                form.reset();
+                
+                // Scroll to the new comment in desktop view
+                const commentsContainer = document.querySelector(`#comments-section-desktop-${postId} .comments-list-container`);
+                if (commentsContainer) {
+                    commentsContainer.scrollTop = 0;
+                }
+            }
+        })
+        .catch(error => console.error("Error:", error));
+    }
+    
+    function submitCommentDesktop(event, postId) {
+        event.preventDefault();
+
+        const form = event.target;
+        const formData = new FormData(form);
+        const commentsListMobile = document.getElementById(`comments-list-mobile-${postId}`);
+        const commentsListDesktop = document.getElementById(`comments-list-desktop-${postId}`);
+        const commentCountElements = document.querySelectorAll(`#comment-count-${postId}`);
+
+        fetch(form.action, {
+            method: "POST",
+            body: formData,
+            headers: {
+                "X-Requested-With": "XMLHttpRequest"
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === "success") {
+                // Create new comment element for desktop
+                const newCommentDesktop = document.createElement("div");
+                newCommentDesktop.classList.add("comment");
+                newCommentDesktop.id = `comment-desktop-${data.comment_id}`;
+                newCommentDesktop.innerHTML = `
+                    <div class="comment-header">
+                        <div class="comment-avatar">
+                            <img src="${data.user_image || '{% static "default_profile.png" %}'}" alt="Profile Image">
+                        </div>
+                        <a href="/profile/${data.user}" class="comment-user">${data.user}</a>
+                        <span class="comment-time">just now</span>
+                    </div>
+                    <div class="comment-content">${data.content}</div>
+                `;
+
+                // Append the new comment to the desktop comment list
+                commentsListDesktop.prepend(newCommentDesktop);
+                
+                // Create new comment for mobile view too (to keep them in sync)
+                const newCommentMobile = document.createElement("div");
+                newCommentMobile.classList.add("comment");
+                newCommentMobile.id = `comment-mobile-${data.comment_id}`;
+                newCommentMobile.innerHTML = newCommentDesktop.innerHTML;
+                
+                // Append to mobile list
+                commentsListMobile.prepend(newCommentMobile);
+                
+                // Update the comment count dynamically
+                commentCountElements.forEach(el => {
+                    el.textContent = data.comment_count;
+                });
+                
+                // Update desktop comments header
+                const commentsHeader = document.querySelector(`#comments-section-desktop-${postId} .comments-header span`);
+                if (commentsHeader) {
+                    commentsHeader.textContent = `Comments (${data.comment_count})`;
+                }
+
+                // Clear the form
+                form.reset();
+                
+                // Scroll to the new comment
+                const commentsContainer = document.querySelector(`#comments-section-desktop-${postId} .comments-list-container`);
+                if (commentsContainer) {
+                    commentsContainer.scrollTop = 0;
+                }
+            }
+        })
+        .catch(error => console.error("Error:", error));
+    }
+
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== "") {
+            const cookies = document.cookie.split(";");
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === name + "=") {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+</script>
+{% endblock %}

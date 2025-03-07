@@ -1,0 +1,124 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Login{% endblock %}
+
+{% block extra_styles %}
+<style>
+    .login-container {
+        max-width: 400px;
+        margin: 2rem auto;
+        padding: 2rem;
+        background-color: var(--bg-white);
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow-md);
+    }
+
+    .login-title {
+        font-size: 1.5rem;
+        font-weight: 700;
+        text-align: center;
+        margin-bottom: 1.5rem;
+        color: var(--text-dark);
+    }
+
+    .login-form .form-group {
+        margin-bottom: 1rem;
+    }
+
+    .login-form .form-label {
+        display: block;
+        margin-bottom: 0.5rem;
+        font-weight: 500;
+        color: var(--text-dark);
+    }
+
+    .login-form .form-control {
+        width: 100%;
+        padding: 0.75rem 1rem;
+        border: 1px solid var(--border-light);
+        border-radius: var(--radius-md);
+        font-size: 1rem;
+        transition: var(--transition);
+    }
+
+    .login-form .form-control:focus {
+        outline: none;
+        border-color: var(--primary);
+        box-shadow: 0 0 0 3px var(--border-focus);
+    }
+
+    .login-form .btn-primary {
+        width: 100%;
+        padding: 0.75rem 1rem;
+        background-color: var(--primary);
+        color: white;
+        border: none;
+        border-radius: var(--radius-md);
+        font-size: 1rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: var(--transition);
+    }
+
+    .login-form .btn-primary:hover {
+        background-color: var(--primary-dark);
+    }
+
+    .login-links {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 1rem;
+        font-size: 0.875rem;
+    }
+
+    .login-links a {
+        color: var(--primary);
+        text-decoration: none;
+        transition: var(--transition);
+    }
+
+    .login-links a:hover {
+        text-decoration: underline;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="login-container">
+    <h2 class="login-title">Welcome Back</h2>
+    <form method="post" class="login-form">
+        {% csrf_token %}
+        <div class="form-group">
+            <label for="id_username" class="form-label">Username</label>
+            <input type="text" name="username" id="id_username"
+                class="form-control" required>
+        </div>
+        <div class="form-group">
+            <label for="id_password" class="form-label">Password</label>
+            <input type="password" name="password" id="id_password"
+                class="form-control" required>
+        </div>
+        <button type="submit" class="btn-primary">Log In</button>
+    </form>
+    <div class="login-links">
+        <a href="{% url 'register' %}">Create Account</a>
+    </div>
+</div>
+{% endblock %}
+
+{% block jscode %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const loginForm = document.querySelector('.login-form');
+        const loginButton = loginForm.querySelector('.btn-primary');
+
+        loginForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            loginButton.disabled = true;
+            loginButton.textContent = 'Logging in...';
+            this.submit();
+        });
+    });
+</script>
+{% endblock %}

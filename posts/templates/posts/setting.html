@@ -1,0 +1,203 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Settings{% endblock %}
+
+{% block extra_styles %}
+<style>
+    .settings-container {
+        max-width: 800px;
+        margin: 2rem auto;
+        padding: 2rem;
+        background-color: var(--bg-white);
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow-md);
+    }
+
+    .settings-title {
+        font-size: 1.5rem;
+        font-weight: 700;
+        margin-bottom: 1.5rem;
+        color: var(--text-dark);
+    }
+
+    .settings-section {
+        margin-bottom: 2rem;
+    }
+
+    .settings-section-title {
+        font-size: 1.25rem;
+        font-weight: 600;
+        margin-bottom: 1rem;
+        color: var(--text-dark);
+    }
+
+    .settings-option {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1rem;
+        border: 1px solid var(--border-light);
+        border-radius: var(--radius-md);
+        margin-bottom: 1rem;
+        transition: var(--transition);
+    }
+
+    .settings-option:hover {
+        background-color: var(--bg-light);
+    }
+
+    .settings-option-label {
+        font-weight: 500;
+        color: var(--text-dark);
+    }
+
+    .settings-option-action {
+        color: var(--primary);
+        text-decoration: none;
+        font-weight: 500;
+        transition: var(--transition);
+    }
+
+    .settings-option-action:hover {
+        text-decoration: underline;
+    }
+
+    .toggle-switch {
+        position: relative;
+        display: inline-block;
+        width: 60px;
+        height: 34px;
+    }
+
+    .toggle-switch input {
+        opacity: 0;
+        width: 0;
+        height: 0;
+    }
+
+    .toggle-slider {
+        position: absolute;
+        cursor: pointer;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: #ccc;
+        transition: .4s;
+        border-radius: 34px;
+    }
+
+    .toggle-slider:before {
+        position: absolute;
+        content: "";
+        height: 26px;
+        width: 26px;
+        left: 4px;
+        bottom: 4px;
+        background-color: white;
+        transition: .4s;
+        border-radius: 50%;
+    }
+
+    input:checked + .toggle-slider {
+        background-color: var(--primary);
+    }
+
+    input:checked + .toggle-slider:before {
+        transform: translateX(26px);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="settings-container">
+    <h1 class="settings-title">Settings</h1>
+
+    <div class="settings-section">
+        <h2 class="settings-section-title">Appearance</h2>
+        <div class="settings-option">
+            <span class="settings-option-label">Dark Mode</span>
+            <label class="toggle-switch">
+                <input type="checkbox" id="dark-mode-toggle">
+                <span class="toggle-slider"></span>
+            </label>
+        </div>
+    </div>
+
+    <div class="settings-section">
+        <h2 class="settings-section-title">Account</h2>
+        <div class="settings-option">
+            <span class="settings-option-label">Edit Profile</span>
+            <a href="{% url 'profile' %}"
+                class="settings-option-action">Edit</a>
+        </div>
+        <div class="settings-option">
+            <span class="settings-option-label">Change Password</span>
+            <a href="{% url 'change_password' %}"
+                class="settings-option-action">Change</a>
+        </div>
+        <div class="settings-option">
+            <span class="settings-option-label">Delete Account</span>
+            <a href="{% url 'delete_account' %}"
+                class="settings-option-action">Delete</a>
+        </div>
+    </div>
+
+    <div class="settings-section">
+        <h2 class="settings-section-title">Help & Support</h2>
+        <div class="settings-option">
+            <span class="settings-option-label">FAQ</span>
+            <a href="{% url 'faq' %}" class="settings-option-action">View</a>
+        </div>
+        <div class="settings-option">
+            <span class="settings-option-label">User Guide</span>
+            <a href="{% url 'user_guide' %}"
+                class="settings-option-action">View</a>
+        </div>
+        <div class="settings-option">
+            <span class="settings-option-label">Contact Support</span>
+            <a href="{% url 'contact_support' %}"
+                class="settings-option-action">Contact</a>
+        </div>
+        <div class="settings-option">
+            <span class="settings-option-label">Feedback</span>
+            <a href="{% url 'feedback' %}"
+                class="settings-option-action">Submit</a>
+        </div>
+    </div>
+
+    <div class="settings-section">
+        <h2 class="settings-section-title">Session</h2>
+        <div class="settings-option">
+            <span class="settings-option-label">Logout</span>
+            <a href="{% url 'logout' %}"
+                class="settings-option-action">Logout</a>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block jscode %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const darkModeToggle = document.getElementById('dark-mode-toggle');
+        
+        // Check if dark mode is enabled in localStorage
+        if (localStorage.getItem('darkMode') === 'enabled') {
+            document.body.classList.add('dark-mode');
+            darkModeToggle.checked = true;
+        }
+
+        darkModeToggle.addEventListener('change', function() {
+            if (this.checked) {
+                document.body.classList.add('dark-mode');
+                localStorage.setItem('darkMode', 'enabled');
+            } else {
+                document.body.classList.remove('dark-mode');
+                localStorage.setItem('darkMode', null);
+            }
+        });
+    });
+</script>
+{% endblock %}
