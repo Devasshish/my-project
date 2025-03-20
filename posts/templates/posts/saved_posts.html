@@ -252,7 +252,10 @@
                     {% csrf_token %}
                     <button type="button" class="post-action unsave"
                         onclick="submitUnsave(event, {{ saved_post.post.id }})">
-                        <i class="fas fa-bookmark"></i>
+                        <!-- <i class="fas fa-bookmark"></i> -->
+                        <img class="form-icon"
+                            src="{% static 'Icons/bookmark-solid.svg' %}"
+                            alt="User Icon" width="16px">
                         <span>Unsave</span>
                     </button>
                 </form>
@@ -263,13 +266,19 @@
     {% else %}
     <div class="empty-state">
         <div class="empty-icon">
-            <i class="fas fa-bookmark"></i>
+            <!-- <i class="fas fa-bookmark"></i> -->
+            <img
+                src="{% static 'Icons/bookmark-solid.svg' %}"
+                alt="User Icon" width="16px">
         </div>
         <h3 class="empty-title">No Saved Posts</h3>
         <p class="empty-text">You haven't saved any posts yet. Browse the feed
             and save posts to view them here later.</p>
         <a href="{% url 'home' %}" class="btn btn-primary">
-            <i class="fas fa-home"></i>
+            <!-- <i class="fas fa-home"></i> -->
+            <img class="form-icon"
+                src="{% static 'Icons/house-solid.svg' %}"
+                alt="User Icon" width="16px">
             Go to Feed
         </a>
     </div>
@@ -327,12 +336,18 @@
                         postsContainer.innerHTML = `
                             <div class="empty-state">
                                 <div class="empty-icon">
-                                    <i class="fas fa-bookmark"></i>
+                                    
+                                    <img class="form-icon"
+                src="{% static 'Icons/bookmark-solid.svg' %}"
+                alt="User Icon">
                                 </div>
                                 <h3 class="empty-title">No Saved Posts</h3>
                                 <p class="empty-text">You haven't saved any posts yet. Browse the feed and save posts to view them here later.</p>
                                 <a href="{% url 'home' %}" class="btn btn-primary">
-                                    <i class="fas fa-home"></i>
+                                    
+                                    <img class="form-icon"
+                src="{% static 'Icons/house-solid.svg' %}"
+                alt="User Icon">
                                     Go to Feed
                                 </a>
                             </div>

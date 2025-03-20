@@ -160,7 +160,7 @@
         font-weight: 600;
         font-size: 1rem;
         cursor: pointer;
-        transition: var(--transition);
+        /* transition: var(--transition); */
         position: relative;
         overflow: hidden;
         box-shadow: var(--shadow-md);
@@ -221,7 +221,7 @@
             </p>
         </div>
 
-        <div class="team-section">
+        <!-- <div class="team-section">
             <h2 class="section-title">Meet Our Team</h2>
             <div class="team-grid">
                 <div class="team-member">
@@ -249,11 +249,15 @@
                     <p class="member-role">UI/UX Designer</p>
                 </div>
             </div>
-        </div>
+        </div> -->
 
         <div class="cta-section">
             <button class="cta-button">
-                <i class="fas fa-user-plus"></i>
+                <!-- <i class="fas fa-user-plus"></i> -->
+                <img
+                    src="{% static 'Icons/user-plus-solid.svg' %}"
+                    alt="User Icon"
+                    width="14px">
                 <span>Join Us Today</span>
             </button>
         </div>

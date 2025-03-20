@@ -87,7 +87,7 @@
     }
     
     .image-preview img {
-        width: 100%;
+        width: 75%;
         height: 100%;
         object-fit: contain;
     }
@@ -268,14 +268,21 @@
                 <div class="image-upload-container">
                     <div class="image-preview" id="image-preview">
                         <div class="image-placeholder">
-                            <i class="fas fa-cloud-upload-alt"></i>
+                            <!-- <i class="fas fa-cloud-upload-alt"></i> -->
+                            <img class="form-icon"
+                                src="{% static 'Icons/cloud-arrow-up-solid.svg' %}"
+                                alt="User Icon">
                             <p>Drag and drop your image here or click to
                                 browse</p>
                         </div>
                     </div>
 
                     <label for="id_image" class="image-upload-label">
-                        <i class="fas fa-camera"></i>
+                        <!-- <i class="fas fa-camera"></i> -->
+                        <img class="form-icon"
+                            src="{% static 'Icons/camera-solid.svg' %}"
+                            alt="User Icon"
+                            width="14px">
                         <span>Choose Image</span>
                     </label>
                     <input type="file" name="image" id="id_image"
@@ -307,7 +314,11 @@
             <div class="form-footer">
                 <a href="{% url 'home' %}" class="btn-cancel">Cancel</a>
                 <button type="submit" class="btn-submit">
-                    <i class="fas fa-paper-plane"></i>
+                    <!-- <i class="fas fa-paper-plane"></i> -->
+                    <img class="form-icon"
+                        src="{% static 'Icons/paper-plane-solid.svg' %}"
+                        alt="User Icon"
+                        width="14px">
                     <span>Share Post</span>
                 </button>
             </div>

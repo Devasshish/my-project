@@ -5,7 +5,7 @@ from .views import register, profile, logout_view, user_profile,logout_view
 from .views import register, profile, user_profile, follow_user, unfollow_user, logout_view
 from django.urls import path
 from django.contrib.auth import views as auth_views
-from .views import register, profile, user_profile, follow_user, unfollow_user,search_users
+from .views import register, profile, user_profile, follow_user, unfollow_user,search_users,forgot_password,change_password
 from . import views
 from django.conf import settings
 from django.conf.urls.static import static
@@ -18,6 +18,9 @@ urlpatterns = [
     path('follow/<str:username>/', views.follow_user, name='follow_user'),
     path('unfollow/<str:username>/', views.unfollow_user, name='unfollow_user'),
     path('search/', search_users, name='search_users'),
+    path('forgot_password/', forgot_password, name='forgot_pass'),
+    path('change_password/', change_password, name='change_password'),
+    path('delete-account/', views.delete_account, name='delete_account'),
 ]
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

@@ -205,7 +205,7 @@
         font-weight: 500;
         font-size: 1rem;
         cursor: pointer;
-        transition: var(--transition);
+        /* transition: var(--transition); */
         display: flex;
         align-items: center;
         justify-content: center;
@@ -239,66 +239,17 @@
             with our team.</p>
     </div>
 
-    <div class="contact-card">
-        <div class="contact-info">
-            <h2 class="info-title">Get In Touch</h2>
-
-            <ul class="info-list">
-                <li class="info-item">
-                    <div class="info-icon">
-                        <i class="fas fa-map-marker-alt"></i>
-                    </div>
-                    <div class="info-content">
-                        <h3 class="info-label">Our Location</h3>
-                        <p class="info-text">123 Social Street, Digital City,
-                            10001</p>
-                    </div>
-                </li>
-                <li class="info-item">
-                    <div class="info-icon">
-                        <i class="fas fa-envelope"></i>
-                    </div>
-                    <div class="info-content">
-                        <h3 class="info-label">Email Us</h3>
-                        <p class="info-text">contact@socialsphere.com</p>
-                    </div>
-                </li>
-                <li class="info-item">
-                    <div class="info-icon">
-                        <i class="fas fa-phone-alt"></i>
-                    </div>
-                    <div class="info-content">
-                        <h3 class="info-label">Call Us</h3>
-                        <p class="info-text">+1 (555) 123-4567</p>
-                    </div>
-                </li>
-                <li class="info-item">
-                    <div class="info-icon">
-                        <i class="fas fa-clock"></i>
-                    </div>
-                    <div class="info-content">
-                        <h3 class="info-label">Working Hours</h3>
-                        <p class="info-text">Monday - Friday: 9AM - 5PM</p>
-                    </div>
-                </li>
-            </ul>
-
-            <div class="social-links">
-                <a href="#" class="social-link">
-                    <i class="fab fa-facebook-f"></i>
-                </a>
-                <a href="#" class="social-link">
-                    <i class="fab fa-twitter"></i>
-                </a>
-                <a href="#" class="social-link">
-                    <i class="fab fa-instagram"></i>
-                </a>
-                <a href="#" class="social-link">
-                    <i class="fab fa-linkedin-in"></i>
-                </a>
-            </div>
+    {% if messages %}
+    <div class="messages">
+        {% for message in messages %}
+        <div class="alert alert-{{ message.tags }}">
+            {{ message }}
         </div>
+        {% endfor %}
+    </div>
+    {% endif %}
 
+    <div class="contact-card">
         <div class="contact-form-container">
             <h2 class="form-title">Send Us a Message</h2>
 
@@ -309,14 +260,22 @@
                     <label for="id_name" class="form-label">Your Name</label>
                     <input type="text" id="id_name" name="name"
                         class="form-control" required>
-                    <i class="fas fa-user form-icon"></i>
+                    <!-- <i class="fas fa-user form-icon"></i> -->
+                    <img class="form-icon"
+                        src="{% static 'Icons/user.svg' %}"
+                        alt="User Icon"
+                        width="14px">
                 </div>
 
                 <div class="form-group">
                     <label for="id_email" class="form-label">Your Email</label>
                     <input type="email" id="id_email" name="email"
                         class="form-control" required>
-                    <i class="fas fa-envelope form-icon"></i>
+                    <!-- <i class="fas fa-envelope form-icon"></i> -->
+                    <img class="form-icon"
+                        src="{% static 'Icons/envelope-solid.svg' %}"
+                        alt="User Icon"
+                        width="14px">
                 </div>
 
                 <div class="form-group">
@@ -324,7 +283,11 @@
                         Number</label>
                     <input type="tel" id="id_phone" name="phone"
                         class="form-control">
-                    <i class="fas fa-phone-alt form-icon"></i>
+                    <!-- <i class="fas fa-phone-alt form-icon"></i> -->
+                    <img class="form-icon"
+                        src="{% static 'Icons/phone-solid.svg' %}"
+                        alt="User Icon"
+                        width="14px">
                 </div>
 
                 <div class="form-group">
@@ -332,11 +295,19 @@
                         Message</label>
                     <textarea id="id_message" name="message"
                         class="form-control" required></textarea>
-                    <i class="fas fa-comment form-icon"></i>
+                    <!-- <i class="fas fa-comment form-icon"></i> -->
+                    <img class="form-icon"
+                        src="{% static 'Icons/comment-solid.svg' %}"
+                        alt="User Icon"
+                        width="14px">
                 </div>
 
                 <button type="submit" class="btn-submit" id="submit-btn">
-                    <i class="fas fa-paper-plane"></i>
+                    <!-- <i class="fas fa-paper-plane"></i> -->
+                    <img
+                        src="{% static 'Icons/paper-plane-solid.svg' %}"
+                        alt="User Icon"
+                        width="14px">
                     <span>Send Message</span>
                 </button>
             </form>
@@ -418,7 +389,12 @@
                 repeat: 1,
                 onComplete: function() {
                     // Change button text
-                    submitBtn.innerHTML = '<i class="fas fa-check"></i><span>Message Sent!</span>';
+                    submitBtn.innerHTML = '<i class="fas fa-check"></i>
+                    <img
+                    src="{% static 'Icons/user-plus-solid.svg' %}"
+                    alt="User Icon"
+                    width="14px">
+                    <span>Message Sent!</span>';
                     
                     // Disable button
                     submitBtn.disabled = true;
@@ -426,7 +402,12 @@
                     // Reset form after delay
                     setTimeout(function() {
                         contactForm.reset();
-                        submitBtn.innerHTML = '<i class="fas fa-paper-plane"></i><span>Send Message</span>';
+                        submitBtn.innerHTML = '<i class="fas fa-paper-plane"></i>
+                        <img
+                    src="{% static 'Icons/user-plus-solid.svg' %}"
+                    alt="User Icon"
+                    width="14px">
+                        <span>Send Message</span>';
                         submitBtn.disabled = false;
                     }, 3000);
                 }

@@ -66,7 +66,7 @@
     }
 
     .login-links {
-        display: flex;
+        /* display: flex; */
         justify-content: space-between;
         margin-top: 1rem;
         font-size: 0.875rem;
@@ -102,6 +102,7 @@
         <button type="submit" class="btn-primary">Log In</button>
     </form>
     <div class="login-links">
+        <a href="{% url 'forgot_pass' %}">Forgot password ?</a><br>
         <a href="{% url 'register' %}">Create Account</a>
     </div>
 </div>

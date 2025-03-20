@@ -1,0 +1,166 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Delete Account - SocialSphere{% endblock %}
+
+{% block extra_styles %}
+<style>
+    .delete-account-container {
+        max-width: 500px;
+        margin: 2rem auto;
+        background-color: var(--card-bg);
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow-md);
+        overflow: hidden;
+    }
+
+    .delete-account-header {
+        background: linear-gradient(135deg, var(--danger), var(--danger-dark));
+        color: white;
+        padding: 2rem;
+        text-align: center;
+    }
+
+    .delete-account-title {
+        font-size: 2rem;
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+    }
+
+    .delete-account-subtitle {
+        font-size: 1rem;
+        opacity: 0.9;
+    }
+
+    .delete-account-form {
+        padding: 2rem;
+    }
+
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
+
+    .form-label {
+        display: block;
+        margin-bottom: 0.5rem;
+        font-weight: 500;
+        color: var(--text-dark);
+    }
+
+    .form-control {
+        width: 100%;
+        padding: 0.875rem 1rem;
+        border: 1px solid var(--border-light);
+        border-radius: var(--radius-md);
+        font-size: 1rem;
+        transition: var(--transition);
+    }
+
+    .form-control:focus {
+        outline: none;
+        border-color: var(--danger);
+        box-shadow: 0 0 0 3px rgba(var(--danger-rgb), 0.2);
+    }
+
+    .btn-delete {
+        width: 100%;
+        padding: 1rem;
+        background: linear-gradient(135deg, var(--danger), var(--danger-dark));
+        color: white;
+        border: none;
+        border-radius: var(--radius-md);
+        font-size: 1rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: var(--transition);
+    }
+
+    .btn-delete:hover {
+        opacity: 0.9;
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-md);
+    }
+
+    .btn-cancel {
+        display: block;
+        text-align: center;
+        margin-top: 1rem;
+        color: var(--text-dark);
+        text-decoration: none;
+        font-weight: 500;
+    }
+
+    .btn-cancel:hover {
+        text-decoration: underline;
+    }
+
+    .error-message {
+        color: var(--danger);
+        font-size: 0.875rem;
+        margin-top: 0.25rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="delete-account-container">
+    <div class="delete-account-header">
+        <h1 class="delete-account-title">Delete Account</h1>
+        <p class="delete-account-subtitle">This action is irreversible</p>
+    </div>
+
+    <form method="post" class="delete-account-form">
+        {% csrf_token %}
+
+        {% if form.non_field_errors %}
+        <div class="error-message">
+            {% for error in form.non_field_errors %}
+            <p>{{ error }}</p>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <div class="form-group">
+            <label for="{{ form.password.id_for_label }}"
+                class="form-label">Enter your password to confirm</label>
+            {{ form.password }}
+            {% if form.password.errors %}
+            <div class="error-message">{{ form.password.errors }}</div>
+            {% endif %}
+        </div>
+
+        <button type="submit" class="btn-delete">Delete My Account</button>
+        <a href="{% url 'setting' %}" class="btn-cancel">Cancel</a>
+    </form>
+</div>
+{% endblock %}
+
+{% block jscode %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        gsap.from('.delete-account-container', {
+            y: 30,
+            opacity: 0,
+            duration: 0.8,
+            ease: 'power2.out'
+        });
+
+        gsap.from('.delete-account-header', {
+            y: -20,
+            opacity: 0,
+            duration: 0.8,
+            delay: 0.2,
+            ease: 'power2.out'
+        });
+
+        gsap.from('.form-group, .btn-delete, .btn-cancel', {
+            y: 20,
+            opacity: 0,
+            duration: 0.6,
+            stagger: 0.1,
+            delay: 0.4,
+            ease: 'power2.out'
+        });
+    });
+</script>
+{% endblock %}

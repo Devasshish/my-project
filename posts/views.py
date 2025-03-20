@@ -18,11 +18,34 @@ def home(request):
 
 def about(request): 
     return render(request, 'posts/about.html') 
+    
+@login_required
 def setting(request): 
     return render(request, 'posts/setting.html') 
 
-def contact(request): 
-    return render(request, 'posts/contact.html') 
+
+from django.shortcuts import render, redirect
+from django.contrib import messages
+from .models import ContactSubmission
+
+def contact(request):
+    if request.method == 'POST':
+        name = request.POST.get('name')
+        email = request.POST.get('email')
+        phone = request.POST.get('phone')
+        message = request.POST.get('message')
+        
+        ContactSubmission.objects.create(
+            name=name,
+            email=email,
+            phone=phone,
+            message=message
+        )
+        
+        messages.success(request, 'Your message has been sent successfully!')
+        return redirect('contact')
+    
+    return render(request, 'posts/contact.html')
 
 @login_required
 def create_post(request):

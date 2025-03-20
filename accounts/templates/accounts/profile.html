@@ -403,8 +403,8 @@
         <img src="{{ user.profile_image.url }}" alt="Profile Picture"
           class="profile-image" id="profile-image">
         {% else %}
-        <div class="profile-image-placeholder" id="profile-image">{{
-          user.username|first|upper }}</div>
+        <div class="profile-image-placeholder" id="profile-image">
+          {{user.username|first|upper }}</div>
         {% endif %}
       </div>
 
@@ -445,19 +445,40 @@
                 class="form-label">{{ field.label }}</label>
               <div class="input-with-icon">
                 {% if field.name == 'first_name' or field.name == 'last_name' %}
-                <i class="fas fa-user input-icon"></i>
+                <!-- <i class="fas fa-user input-icon"></i> -->
+                <img class="input-icon"
+                  src="{% static 'Icons/user.svg' %}"
+                  alt="User Icon" width="16px">
                 {% elif field.name == 'email' %}
-                <i class="fas fa-envelope input-icon"></i>
+                <!-- <i class="fas fa-envelope input-icon"></i> -->
+                <img class="input-icon"
+                  src="{% static 'Icons/envelope-solid.svg' %}"
+                  alt="User Icon" width="16px">
                 {% elif field.name == 'bio' %}
-                <i class="fas fa-info-circle input-icon"></i>
+                <!-- <i class="fas fa-info-circle input-icon"></i> -->
+                <img class="input-icon"
+                  src="{% static 'Icons/circle-info-solid.svg' %}"
+                  alt="User Icon" width="16px">
                 {% elif field.name == 'website' %}
-                <i class="fas fa-globe input-icon"></i>
+                <!-- <i class="fas fa-globe input-icon"></i> -->
+                <img class="input-icon"
+                  src="{% static 'Icons/globe-solid.svg' %}"
+                  alt="User Icon">
                 {% elif field.name == 'location' %}
-                <i class="fas fa-map-marker-alt input-icon"></i>
+                <!-- <i class="fas fa-map-marker-alt input-icon"></i> -->
+                <img class="input-icon"
+                  src="{% static 'Icons/location-dot-solid.svg' %}"
+                  alt="User Icon">
                 {% elif field.name == 'phone' %}
-                <i class="fas fa-phone input-icon"></i>
+                <!-- <i class="fas fa-phone input-icon"></i> -->
+                <img class="input-icon"
+                  src="{% static 'Icons/phone-solid.svg' %}"
+                  alt="User Icon">
                 {% else %}
-                <i class="fas fa-edit input-icon"></i>
+                <!-- <i class="fas fa-edit input-icon"></i> -->
+                <img class="input-icon"
+                  src="{% static 'Icons/pen-to-square-solid.svg' %}"
+                  alt="User Icon" width="16px">
                 {% endif %}
 
                 {% if field.field.widget.input_type == 'textarea' %}
@@ -485,7 +506,10 @@
 
           <div class="form-actions">
             <button type="submit" class="btn-primary" id="update-profile-btn">
-              <i class="fas fa-save"></i>
+              <!-- <i class="fas fa-save"></i> -->
+              <img class="form-icon"
+                src="{% static 'Icons/floppy-disk-solid.svg' %}"
+                alt="User Icon" width="16px">
               <span>Update Profile</span>
             </button>
           </div>

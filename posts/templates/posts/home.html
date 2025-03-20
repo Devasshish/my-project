@@ -484,7 +484,10 @@
                         <button type="button"
                             class="post-action {% if post.is_liked %}liked{% endif %}"
                             onclick="submitLike(event, {{ post.id }})">
-                            <i class="fas fa-heart"></i>
+                            <!-- <i class="fas fa-heart"></i> -->
+                            <img class="form-icon"
+                                src="{% static 'Icons/heart-solid.svg' %}"
+                                alt="User Icon">
                             <span
                                 id="like-count-{{ post.id }}">{{post.like_count}}</span>
                         </button>
@@ -492,7 +495,10 @@
 
                     <button type="button" class="post-action"
                         onclick="toggleComments({{ post.id }})">
-                        <i class="fas fa-comment"></i>
+                        <!-- <i class="fas fa-comment"></i> -->
+                        <img class="form-icon"
+                            src="{% static 'Icons/comment-solid.svg' %}"
+                            alt="User Icon">
                         <span
                             id="comment-count-{{ post.id }}">{{post.comments.count}}</span>
                     </button>
@@ -503,7 +509,10 @@
                         <button type="button"
                             class="post-action {% if post.is_saved %}saved{% endif %}"
                             onclick="submitSave(event, {{ post.id }})">
-                            <i class="fas fa-bookmark"></i>
+                            <!-- <i class="fas fa-bookmark"></i> -->
+                            <img class="form-icon"
+                                src="{% static 'Icons/bookmark-solid.svg' %}"
+                                alt="User Icon" width="16px">
                             <span>Save</span>
                         </button>
                     </form>
@@ -626,12 +635,18 @@
     <div class="empty-state">
         <div class="empty-icon">
             <i class="fas fa-photo-video"></i>
+            <img class="form-icon"
+                src="{% static 'Icons/user.svg' %}"
+                alt="User Icon">
         </div>
         <h3 class="empty-title">No Posts Yet</h3>
         <p class="empty-text">Follow more users or create your first post to see
             content here.</p>
         <a href="{% url 'create_post' %}" class="btn btn-primary">
-            <i class="fas fa-plus"></i>
+            <!-- <i class="fas fa-plus"></i> -->
+            <img class="form-icon"
+                src="{% static 'Icons/cloud-arrow-up-solid.svg' %}"
+                alt="User Icon">
             Create Post
         </a>
     </div>
@@ -714,7 +729,7 @@
         event.preventDefault();
         const form = document.getElementById(`like-form-${postId}`);
         const button = form.querySelector('button');
-        const icon = button.querySelector('i');
+        const icon = button.querySelector('img');
         const data = new FormData(form);
         
         // Add heart beat animation
